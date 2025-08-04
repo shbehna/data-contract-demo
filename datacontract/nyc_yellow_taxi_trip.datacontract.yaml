@@ -1,0 +1,161 @@
+dataContractSpecification: 1.2.0
+id: nyc_tlc_v1
+info:
+  title: nyc_tlc_v1
+  version: 1.0.0
+  description: Provide data about the NYC Taxi and Limousine Commission (TLC).
+servers: 
+  default: 
+    type: databricks
+    catalog: nprod
+    schema: tlc
+models:
+  yellow_trip:
+    description: NYC Yellow Taxi Trip Records
+    type: table
+    fields:
+      VendorID:
+        type: int
+        required: true
+        primaryKey: false
+        description: TPEP provider
+        quality: 
+        - type: sql
+          description: Check VendorID is in a list of known values. 
+          query: | 
+            SELECT COUNT(1) 
+            FROM yellow_trip 
+            WHERE VendorID NOT IN (1, 2, 6, 7)
+          mustBeLessThanOrEqualTo: 0
+      tpep_pickup_datetime:
+        type: timestamp_ntz
+        required: true
+        primaryKey: false
+        description: Date and time when the meter was engaged.
+      tpep_dropoff_datetime:
+        type: timestamp_ntz
+        required: true
+        primaryKey: false
+        description: Date and time when the meter was disengaged.
+      passenger_count:
+        type: bigint
+        required: false
+        primaryKey: false
+        description: Number of passengers in the vehicle.
+        quality: 
+        - type: sql
+          description: Check outliers in passenger_count
+          query: |
+            SELECT COUNT(1)
+            FROM yellow_trip
+            WHERE passenger_count >= 8
+          mustBeLessThanOrEqualTo: 0
+      trip_distance:
+        type: double
+        required: true
+        primaryKey: false
+        description: Trip distance in miles.
+        quality: 
+        - type: sql
+          description: Check outliers in trip_distance
+          query: |
+            SELECT COUNT(1)
+            FROM yellow_trip
+            WHERE trip_distance >= 60
+          mustBeLessThanOrEqualTo: 0
+      RatecodeID:
+        type: bigint
+        required: false
+        primaryKey: false
+        description: Rate code (e.g., Standard, JFK, Newark, etc.)
+        quality: 
+        - type: sql
+          description: Check RatecodeID is in a list of known values. 
+          query: | 
+            SELECT COUNT(1) 
+            FROM yellow_trip 
+            WHERE RatecodeID NOT IN (1, 2, 3, 4, 5, 6)
+          mustBeLessThanOrEqualTo: 0
+      store_and_fwd_flag:
+        type: string
+        required: false
+        primaryKey: false
+        description: Whether the trip record was sent to the vendor or held in the vehicle.
+        quality: 
+        - type: sql
+          description: Check store_and_fwd_flag is Y or N
+          query: | 
+            SELECT COUNT(1) 
+            FROM yellow_trip 
+            WHERE store_and_fwd_flag NOT IN ('Y', 'N')
+          mustBeLessThanOrEqualTo: 0
+      PULocationID:
+        type: integer
+        required: true
+        primaryKey: false
+        description: Pickup location ID.
+      DOLocationID:
+        type: integer
+        required: true
+        primaryKey: false
+        description: Dropoff location ID.
+      payment_type:
+        type: bigint
+        required: false
+        primaryKey: false
+        description: Payment type (e.g., Credit card, Cash, No charge, Dispute, Unknown, Voided trip)
+      fare_amount:
+        type: double
+        required: true
+        primaryKey: false
+        description: Fare amount charged.
+      extra:
+        type: double
+        required: true
+        primaryKey: false
+        description: Extra charges (e.g., surcharge, tolls).
+      mta_tax:
+        type: double
+        required: true
+        primaryKey: false
+        description: MTA tax charged.
+      tip_amount:
+        type: double
+        required: true
+        primaryKey: false
+        description: Tip amount.
+      tolls_amount:
+        type: double
+        required: true
+        primaryKey: false
+        description: Tolls amount.
+      improvement_surcharge:
+        type: double
+        required: true
+        primaryKey: false
+        description: Improvement surcharge.
+      total_amount:
+        type: double
+        required: true
+        primaryKey: false
+        description: Total amount charged to passengers.
+      congestion_surcharge:
+        type: double
+        required: false
+        primaryKey: false
+        description: Total amount collected in trip for NYS congestion surcharge.
+      Airport_fee:
+        type: double
+        required: false
+        primaryKey: false
+        description: For pick up only at LaGuardia and John F. Kennedy Airports
+      cbd_congestion_fee:
+        type: double
+        required: true
+        primaryKey: false
+        description: Per-trip charge for MTA's Congestion Relief Zone starting Jan. 5, 2025
+servicelevels:
+  freshness:
+    description: Check that trips are loaded monthly
+    threshold: 31d
+    timestampField: yellow_trip.tpep_pickup_datetime

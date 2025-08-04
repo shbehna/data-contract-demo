@@ -1,0 +1,90 @@
+apiVersion: v3.0.2
+kind: DataContract
+
+id: b7c8e6a2-4f3d-4e9a-9c2a-8e1d2f7b6c3e
+name: nyc_tlc_v1
+version: 1.0.0
+status: active
+domain: seller
+dataProduct: nyc_tlc
+
+description: 
+  purpose: Provide data about the NYC Taxi and Limousine Commission (TLC).
+
+schema:
+  - name: nyc_yellow_taxi_trip 
+    logicalType: object
+    physicalType: table
+    description: NYC Yellow Taxi Trip Records
+    authoritativeDefinitions: 
+      - url: https://www.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_yellow.pdf
+        type: businessDefinition
+    properties:
+      - name: VendorID
+        logicalType: string
+        description: TPEP provider
+        quality: 
+        - rule: validValues
+          validValues: [
+            '1', # Creative Mobile Technologies, LLC
+            '2', # Curb Mobility, LLC
+            '6', # Myle Technologies Inc
+            '7', # Helix
+          ]
+      - name: tpep_pickup_datetime
+        logicalType: date
+        description: Date and time when the meter was engaged.
+      - name: tpep_dropoff_datetime
+        logicalType: date
+        description: Date and time when the meter was disengaged.
+      - name: passenger_count
+        logicalType: integer
+        description: Number of passengers in the vehicle.
+      - name: trip_distance
+        logicalType: number
+        description: Trip distance in miles.
+      - name: RatecodeID
+        logicalType: integer
+        description: Rate code (e.g., Standard, JFK, Newark, etc.)
+      - name: store_and_fwd_flag
+        logicalType: string
+        description: Whether the trip record was sent to the vendor or held in the vehicle.
+      - name: PULocationID
+        logicalType: integer
+        description: Pickup location ID.
+      - name: DOLocationID
+        logicalType: integer
+        description: Dropoff location ID.
+      - name: payment_type
+        logicalType: integer
+        description: Payment type (e.g., Credit card, Cash, No charge, Dispute, Unknown, Voided trip)
+      - name: fare_amount
+        logicalType: number
+        description: Fare amount charged.
+      - name: extra
+        logicalType: number
+        description: Extra charges (e.g., surcharge, tolls).
+      - name: mta_tax
+        logicalType: number
+        description: MTA tax charged.
+      - name: tip_amount
+        logicalType: number
+        description: Tip amount.
+      - name: tolls_amount
+        logicalType: number
+        description: Tolls amount.
+      - name: improvement_surcharge
+        logicalType: number
+        description: Improvement surcharge.
+      - name: total_amount
+        logicalType: number
+        description: Total amount charged to passengers.
+      - name: congestion_surcharge
+        logicalType: number
+        description: Total amount collected in trip for NYS congestion surcharge.
+      - name: airport_fee
+        logicalType: number
+        description: For pick up only at LaGuardia and John F. Kennedy Airports
+      - name: cbd_ocngestion_fee
+        logicalType: number
+        description: Per-trip charge for MTA's Congestion Relief Zone starting Jan. 5, 2025

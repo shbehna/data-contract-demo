@@ -1,0 +1,1 @@
+databricks-labs-dqx==0.7.1
